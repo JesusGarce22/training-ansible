@@ -1,0 +1,14 @@
+---
+- hosts: azure_vm
+  become: yes
+  tasks:
+    - name: Instalar pip
+      apt:
+        name: python3-pip
+        state: present
+        update_cache: yes
+
+    - name: Instalar Docker SDK para Python
+      pip:
+        name: docker
+        state: present
