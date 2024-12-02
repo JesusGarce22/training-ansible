@@ -1,0 +1,40 @@
+---
+- name: Ensure Docker Compose is installed
+  ansible.builtin.shell: |
+    if ! command -v docker-compose &> /dev/null; then
+      curl -L "https://github.com/docker/compose/releases/download/v2.17.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      chmod +x /usr/local/bin/docker-compose
+    fi
+  args:
+    executable: /bin/bash
+
+- name: Create application directory
+  ansible.builtin.file:
+    path: /opt/docker-petclinic
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Copy docker-compose.yml to remote host
+  ansible.builtin.copy:
+    src: docker-compose.yml
+    dest: /opt/docker-petclinic/docker-compose.yml
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Copy docker directory to remote host
+  ansible.builtin.copy:
+    src: docker
+    dest: /opt/docker-petclinic
+    owner: root
+    group: root
+    mode: '0755'
+    remote_src: no
+
+- name: Start Docker Compose application
+  ansible.builtin.shell: |
+    docker-compose up -d
+  args:
+    chdir: /opt/docker-petclinic
